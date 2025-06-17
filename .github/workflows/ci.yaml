@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jar-${{ matrix.os }}
-          path: build/libs/*.jar
+          path: app/build/libs/*.jar
 
       - name: Run jpackage task
         run: |
@@ -57,5 +57,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jpackage-${{ matrix.os }}
-          path: build/jpackage/${{ matrix.os == 'ubuntu-latest' && 'linux' || matrix.os == 'windows-latest' && 'windows' || matrix.os == 'macos-latest' && 'macos' }}/
+          path: app/build/jpackage/${{ matrix.os == 'ubuntu-latest' && 'linux' || matrix.os == 'windows-latest' && 'windows' || matrix.os == 'macos-latest' && 'macos' }}/
 

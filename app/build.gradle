@@ -5,6 +5,7 @@ plugins {
 def appName = 'bank-java'
 def appVersion = '1.0.0'
 def mainClass = 'net.tasinfarhan.bank.Main'
+def modules = 'java.base'
 
 repositories {
     mavenCentral()
@@ -36,54 +37,105 @@ jar {
     archiveVersion.set(appVersion)
 }
 
+// Task to create runtime image for Linux
+task createRuntimeImageLinux(type: Exec) {
+    group = 'distribution'
+    description = 'Create Linux custom runtime image with jlink'
+    commandLine = [
+        'jlink',
+        '--output', "$buildDir/custom-runtime-linux",
+        '--add-modules', modules,
+        '--compress=2',
+        '--no-header-files',
+        '--no-man-pages'
+    ]
+    onlyIf { org.gradle.internal.os.OperatingSystem.current().isLinux() }
+}
+
+// Task to create runtime image for Windows
+task createRuntimeImageWindows(type: Exec) {
+    group = 'distribution'
+    description = 'Create Windows custom runtime image with jlink'
+    commandLine = [
+        'jlink',
+        '--output', "$buildDir/custom-runtime-windows",
+        '--add-modules', modules,
+        '--compress=2',
+        '--no-header-files',
+        '--no-man-pages'
+    ]
+    onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows() }
+}
+
+// Task to create runtime image for macOS
+task createRuntimeImageMac(type: Exec) {
+    group = 'distribution'
+    description = 'Create macOS custom runtime image with jlink'
+    commandLine = [
+        'jlink',
+        '--output', "$buildDir/custom-runtime-mac",
+        '--add-modules', modules,
+        '--compress=2',
+        '--no-header-files',
+        '--no-man-pages'
+    ]
+    onlyIf { org.gradle.internal.os.OperatingSystem.current().isMacOsX() }
+}
+
+// jpackage Linux
 tasks.register('jpackageLinux', Exec) {
-    dependsOn 'jar'
+    dependsOn 'jar', 'createRuntimeImageLinux'
     group = 'distribution'
     description = 'Package app as Linux native installer'
 
     commandLine = [
         'jpackage',
         '--type', 'app-image',
-        '--input', "${buildDir}/libs",
+        '--input', "$buildDir/libs",
         '--name', appName,
         '--main-jar', "${appName}-${appVersion}.jar",
         '--main-class', mainClass,
         '--java-options', '-Xmx512m',
-        '--dest', "${buildDir}/jpackage/linux"
+        '--dest', "$buildDir/jpackage/linux",
+        '--runtime-image', "$buildDir/custom-runtime-linux"
     ]
 }
 
+// jpackage Windows
 tasks.register('jpackageWindows', Exec) {
-    dependsOn 'jar'
+    dependsOn 'jar', 'createRuntimeImageWindows'
     group = 'distribution'
     description = 'Package app as Windows native installer'
 
     commandLine = [
         'jpackage',
         '--type', 'exe',
-        '--input', "${buildDir}/libs",
+        '--input', "$buildDir/libs",
         '--name', appName,
         '--main-jar', "${appName}-${appVersion}.jar",
         '--main-class', mainClass,
         '--win-console',
         '--java-options', '-Xmx512m',
-        '--dest', "${buildDir}/jpackage/windows"
+        '--dest', "$buildDir/jpackage/windows",
+        '--runtime-image', "$buildDir/custom-runtime-windows"
     ]
 }
 
+// jpackage macOS
 tasks.register('jpackageMac', Exec) {
-    dependsOn 'jar'
+    dependsOn 'jar', 'createRuntimeImageMac'
     group = 'distribution'
     description = 'Package app as macOS native installer'
 
     commandLine = [
         'jpackage',
         '--type', 'pkg',
-        '--input', "${buildDir}/libs",
+        '--input', "$buildDir/libs",
         '--name', appName,
         '--main-jar', "${appName}-${appVersion}.jar",
         '--main-class', mainClass,
         '--java-options', '-Xmx512m',
-        '--dest', "${buildDir}/jpackage/macos"
+        '--dest', "$buildDir/jpackage/macos",
+        '--runtime-image', "$buildDir/custom-runtime-mac"
     ]
 }

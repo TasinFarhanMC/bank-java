@@ -44,6 +44,7 @@ jobs:
           path: app/build/libs/*.jar
 
       - name: Run jpackage task
+        shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             ./gradlew jpackageLinux --no-daemon

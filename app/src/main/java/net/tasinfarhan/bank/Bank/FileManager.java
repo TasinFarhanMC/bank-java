@@ -3,13 +3,13 @@
  */
 package net.tasinfarhan.bank.Bank;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import net.tasinfarhan.bank.Bank.Accounts.Current_Account;
+import java.io.File;
 
 public record FileManager() {
     public static final String FileType = ".acc";
@@ -18,9 +18,9 @@ public record FileManager() {
     private static String computeAppData() {
         String appdataEnv = System.getenv("APPDATA");
         if (appdataEnv != null && !appdataEnv.isEmpty()) {
-            return appdataEnv + File.separator + ".bank";
+            return appdataEnv + File.separator + ".bank-java";
         }
-        return System.getProperty("user.home") + File.separator + ".bank";
+        return System.getProperty("user.home") + File.separator + ".bank-java";
     }
 
     public static final String Account = AppData + "/accounts/";

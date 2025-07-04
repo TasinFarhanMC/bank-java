@@ -18,9 +18,9 @@ public record FileManager() {
     private static String computeAppData() {
         String appdataEnv = System.getenv("APPDATA");
         if (appdataEnv != null && !appdataEnv.isEmpty()) {
-            return appdataEnv + File.separator + ".bank-java";
+            return appdataEnv + File.separator + ".bms-java";
         }
-        return System.getProperty("user.home") + File.separator + ".bank-java";
+        return System.getProperty("user.home") + File.separator + ".bms-java";
     }
 
     public static final String Account = AppData + "/accounts/";
